@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     public function index() {
-        $data = User::all();
+        $data = User::whereDoesntHave('roles', function($query) {
+            $query->where('name', 'admin');
+        })->get();
         return response()->json($data, 200);
     }
 

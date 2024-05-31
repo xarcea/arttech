@@ -1,0 +1,47 @@
+.lg-componente {
+    display: flex;
+    flex-direction: column;
+    background-color: #b5aa98;
+    width: fit-content;
+    height: fit-content;
+    padding: 0px 20px 20px 20px;
+    align-items: center;
+    color: white;
+}
+
+.body {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 50px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+}
+
+.boton-enviar {
+    width: fit-content;
+}
+
+.form-boton {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+img {
+    width: 200px;
+    height: 200px;
+}
+
+input::-ms-reveal,
+input::-ms-clear,
+input::-webkit-clear-button,
+input::-webkit-password-toggle {
+    display: none;
+}

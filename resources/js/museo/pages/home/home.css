@@ -1,0 +1,30 @@
+.hp-componente {
+    display: flex;
+    background-color: #dcd4c3;
+    width: 70%;
+    flex-direction: column;
+    margin-top: 64px;
+    padding-top: 60px;
+}
+
+.datos-usuario{
+    display: flex;
+    gap: 100px;
+    padding-left: 100px;
+    align-items: center;
+}
+
+.img-datos-usuario {
+    width: 200px;
+    height: 200px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.h1 {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
