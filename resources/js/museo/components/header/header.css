@@ -1,0 +1,10 @@
+.perfil {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.header-datos-usuario {
+    display: flex;
+    flex-direction: column;
+}

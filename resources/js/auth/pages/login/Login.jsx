@@ -1,17 +1,28 @@
-import { InputComponent, InputPassword } from '../../../museo/components';
+import { AlertDialog, InputComponent, InputPassword } from '../../../museo/components';
 import Button from '@mui/material/Button';
-import { useState } from 'react';
-import axios from 'axios';
-import { Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthUser } from '../../components';
 
 import './login.css';
 
 export const Login = () => {
+    const { setToken, getToken } = AuthUser();
     const [email, setEmail] = useState('');
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [emailError, setEmailError] = useState(false);
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (getToken()) {
+            navigate('/')
+        }
+    }, []);
 
     const handleEmailChange = (event) => {
         setEmailErrorMessage('');
@@ -29,8 +40,7 @@ export const Login = () => {
         return emailRegex.test(email);
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+    const validateCredentials = () => {
         let emailIsValid = true;
         let passwordIsValid = true;
         if (email === '') {
@@ -46,32 +56,62 @@ export const Login = () => {
             setPasswordError(true);
             passwordIsValid = false;
         }
+        return emailIsValid && passwordIsValid;
+    }
 
-        if (emailIsValid && passwordIsValid) {
+    const handleOpenDialog = (message) => {
+        setErrorMessage(message);
+        setDialogOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const credentialsAreValid = validateCredentials();
+        if (credentialsAreValid) {
+            await fetch('/sanctum/csrf-cookie', {
+                method: 'GET',
+                credentials: 'include'
+            });
+
             const api_url = 'http://localhost:8000/api';
             const data = { email, password };
-            axios.post(`${api_url}/login`, data)
-                .then((response) => {
-                    if (response.data.success) {
-                        console.log(response.data);
-                        // TODO: Implementar la lógica para success
+
+            await fetch(`${api_url}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+                credentials: 'include'
+            }).then(async (response) => {
+                await response.json().then((data) => {
+                    console.log(data)
+                    if (data.success) {
+                        setToken(data.user, data.token, data.role[0]);
+                        navigate('/');
                     } else {
-                        // TODO: Mostrar un mensaje de error al usuario
+                        handleOpenDialog('El correo o la contraseña son incorrectos. Inténtalo de nuevo.');
                     }
                 })
-                .catch((error) => { //TODO: Manejar errores de solicitud al servidor
-                    // Manejar errores de solicitud al servidor
-                    // Mostrar un mensaje de error al usuario
-                });
+                    .catch(() => {
+                        handleOpenDialog('Error al intentar iniciar sesión. Inténtalo de nuevo más tarde.');
+                    });
+            }).catch(() => {
+                handleOpenDialog('Error al intentar iniciar sesión. Inténtalo de nuevo más tarde.');
+            });
         }
     }
 
     return (
-        <div className="body">
+        <div className="lg-body">
             <div className='lg-componente'>
                 <h1>¡Bienvenido!</h1>
                 <h3>Introduce tus datos para iniciar sesión</h3>
-                <img className='img-datos-usuario' src='/assets/imgs/account_circle_white.svg' />
+                <img className='img-datos-usuario' src='/storage/assets/imgs/account_circle_white.svg' />
                 <form className="form" onSubmit={handleSubmit}>
                     <InputComponent
                         id='filled-email-input'
@@ -104,6 +144,13 @@ export const Login = () => {
                     </div>
                 </form>
             </div>
+            <AlertDialog
+                open={dialogOpen}
+                onClose={handleCloseDialog}
+                titulo="Error"
+                mensaje={errorMessage}
+                error={true}
+            />
         </div>
     )
 }

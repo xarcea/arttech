@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export const AuthUser = () => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
+
     const getToken = () => {
         const tokenString = sessionStorage.getItem('token');
         const token = JSON.parse(tokenString);
@@ -34,7 +35,7 @@ export const AuthUser = () => {
 
     const getLogout = () => {
         sessionStorage.clear();
-        return <Navigate to="/" />
+        navigate('/');
     }
     
     return {

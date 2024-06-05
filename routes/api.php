@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\Admin\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Admin\UserController;
+use App\Http\Controllers\Api\Admin\FileUserController;
 use App\Http\Controllers\Api\Coordinador\ActividadControllerCoordinador;
 use App\Http\Controllers\Api\Coordinador\ArchivoControllerCoordinador;
 use App\Http\Controllers\Api\Coordinador\BitacoraControllerCoordinador;
@@ -23,12 +24,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group([], function () {
     //públicas
     Route::post('/login', [AuthController::class, 'login']);
-
+    
     //privadas
-    Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
-
+        Route::put('/update-password', [UserController::class, 'updatePassword']);
+        
         //administrador
+        Route::post('/empleado/archivo', [FileUserController::class, 'store']);
         Route::apiResource('/empleados', UserController::class);
 
         //empleados

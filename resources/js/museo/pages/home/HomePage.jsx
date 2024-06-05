@@ -1,25 +1,165 @@
-import { useState } from 'react'
-import { MainLayout } from '../../components'
+import { AlertDialog, ImageAvatars } from '../../components'
+import { AuthUser } from '../../../auth/components';
+import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import Box from '@mui/material/Box';
+import { useRef, useState } from 'react';
+
 import './home.css'
 
 export const HomePage = () => {
-    const [empleado, setEmpleado] = useState({ puesto: 'Puesto', nombre: 'Nombre', id: 'ID', correo: 'Correo' });
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [message, setMessage] = useState('');
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+
+    const { user, getRole, getToken } = AuthUser();
+    const navigate = useNavigate();
+    const fileInputRef = useRef(null);
+
+    const handleFileChange = (e) => {
+        setSelectedFile(e.target.files[0]);
+        setMessage('');
+    };
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            setMessage('Por favor seleccione un archivo.');
+            return;
+        }
+
+        if(selectedFile.size > 1000000) {
+            setMessage('El archivo es demasiado grande. Por favor seleccione un archivo de menos de 1MB.');
+            return;
+        }
+
+        if(!selectedFile.type.includes('image')) {
+            setMessage('Por favor seleccione un archivo de imagen.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('user_id', user.id);
+
+        try {
+            const api_url = 'http://localhost:8000/api';
+            await axios.get('/sanctum/csrf-cookie');
+            const response = await axios.post(`${api_url}/empleado/archivo`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${getToken()}`
+                }
+            });
+            if (response.data.success) {
+                setSelectedFile(null);
+                handleOpenDialog('La foto se actualizó correctamente. Los cambios se verán reflejados en la siguiente sesión');
+            } else {
+                console.log(response.data.message);
+                setSelectedFile(null);
+                setMessage('Error al subir el archivo.');
+            }
+        } catch (error) {
+            setSelectedFile(null);
+            setMessage('Error al subir el archivo.');
+            console.error(error);
+        }
+    };
+
+    const handleOpenDialog = (message) => {
+        setSuccessMessage(message);
+        setDialogOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+    };
+
+    const renderBoton = () => {
+        if (getRole() === 'admin') {
+            return (
+                <>
+                    <AlertDialog 
+                        open={dialogOpen}
+                        onClose={handleCloseDialog}
+                        titulo="Foto actualizada"
+                        mensaje={successMessage}
+                        error={false}
+                    />
+                    <Box sx={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                        <input type="file" onChange={handleFileChange} style={{ display: 'none' }} ref={fileInputRef} />
+                        <Button
+                            onClick={() => fileInputRef.current.click()}
+                            className='boton-enviar'
+                            variant="contained"
+                            sx={{
+                                backgroundColor: '#ddd4c3',
+                                "&:hover": {
+                                    backgroundColor: '#ddd4c3'
+                                },
+                                color: 'black',
+                            }}
+                        >Actualizar foto de perfil</Button>
+                        {selectedFile &&
+                            <p>{selectedFile.name}</p>
+                        }
+                    </Box>
+                    {message && <p>{message}</p>}
+                    {selectedFile && !message &&
+                        <Button
+                            onClick={handleUpload}
+                            className='boton-enviar'
+                            variant="contained"
+                            sx={{
+                                backgroundColor: '#ddd4c3',
+                                "&:hover": {
+                                    backgroundColor: '#ddd4c3'
+                                },
+                                color: 'black',
+                            }}
+                        >Subir archivo</Button>
+                    }
+                </>
+            )
+        }
+    }
 
     return (
-        <MainLayout>
-            <div className='hp-componente'>
-                <div className="h1">
-                    <h1>{empleado.puesto}</h1>
-                </div>
+        <div className='hp-componente'>
+            <div className="h1">
+                <h1>{user.role}</h1>
+            </div>
+            <div className="hp-gap">
                 <div className="datos-usuario">
-                    <img className='img-datos-usuario' src='/assets/imgs/account_circle.svg' />
+                    <ImageAvatars
+                        name={user.name}
+                        avatar={user.avatar}
+                        size='200px'
+                        fontSize='4rem'
+                    />
                     <div className="datos-usuario-texto">
-                        <h2>{empleado.nombre}</h2>
-                        <h2>{empleado.id}</h2>
-                        <h2>{empleado.correo}</h2>
+                        <h2>Nombre: {user.name}</h2>
+                        <h2>ID de empleado: {user.employee_id}</h2>
+                        <h2>Correo electrónico: {user.email}</h2>
                     </div>
                 </div>
+                <div className="hp-button">
+                    <Button
+                        type="submit"
+                        className='boton-enviar'
+                        variant="contained"
+                        sx={{
+                            backgroundColor: '#ddd4c3',
+                            "&:hover": {
+                                backgroundColor: '#ddd4c3'
+                            },
+                            color: 'black',
+                        }}
+                        onClick={() => navigate('/update-password')}
+                    >Cambiar contraseña</Button>
+                    {renderBoton()}
+                </div>
             </div>
-        </MainLayout>
+        </div>
     )
 }

@@ -22,25 +22,37 @@ class AuthController extends Controller
         if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = auth()->user();
             if ($user instanceof \App\Models\User) {
-                $response['token'] = $user->createToken('authToken')->plainTextToken;
-                $response['user'] = $user;
-                $response['role'] = $user->roles->pluck('name');
-                $response['success'] = true;
+                $avatar = $user->file;
+                $response = [
+                    'token' => $user->createToken('authToken')->plainTextToken,
+                    'user' => [
+                        'email' => $user->email,
+                        'employee_id' => $user->employee_id,
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'role' => $user->role,
+                        'avatar' => $avatar ? $avatar->path : null
+                    ],
+                    'role' => $user->roles->pluck('name'),
+                    'success' => true
+                ];
             }
         } else {
             $response['message'] = 'Credenciales incorrectas';
+            $response['success'] = false;
             return response()->json($response, 401);
         }
         return response()->json($response, 200);
     }
 
     public function logout() {
-        $response = ['success' => false];
         $user = auth()->user();
         if ($user instanceof \App\Models\User) {
             $user->tokens()->delete();
+            $response = ['success' => true, 'message' => 'Sesión cerrada'];
+        } else {
+            return response()->json(['message' => 'Error'], 401);
         }
-        $response = ['success' => true, 'message' => 'Sesión cerrada'];
         return response()->json($response, 200);
     }
 }

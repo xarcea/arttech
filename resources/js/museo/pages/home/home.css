@@ -1,6 +1,7 @@
 .hp-componente {
     display: flex;
-    background-color: #dcd4c3;
+    /* background-color: #dcd4c3; */
+    background-color: #ffff;
     width: 70%;
     flex-direction: column;
     margin-top: 64px;
@@ -27,4 +28,22 @@ h1 {
     width: 100%;
     display: flex;
     justify-content: center;
+}
+
+.hp-gap{
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+}
+
+.hp-button {
+    padding-left: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+p {
+    padding: 0px;
+    margin: 0px
 }
