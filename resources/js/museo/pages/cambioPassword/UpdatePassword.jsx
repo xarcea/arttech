@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { AlertDialog, InputPassword } from '../../components'
+import { AlertDialog, CirculoEspera, InputPassword } from '../../components'
 import { Button } from '@mui/material'
 import { AuthUser } from '../../../auth/components'
 
@@ -13,6 +13,7 @@ export const UpdatePassword = () => {
     const [error, setError] = useState(false)
     const [message, setMessage] = useState('');
     const [alertError, setAlertError] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const { getToken, user } = AuthUser();
 
@@ -53,6 +54,7 @@ export const UpdatePassword = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (validatePassword()) {
+            setLoading(true);
             await fetch('/sanctum/csrf-cookie', {
                 method: 'GET',
                 credentials: 'include'
@@ -75,75 +77,82 @@ export const UpdatePassword = () => {
                 await response.json().then((data) => {
                     console.log(data)
                     if (data.success) {
+                        setLoading(false);
                         handleOpenDialog('Contraseña actualizada correctamente');
                         setAlertError(false);
                     } else {
+                        setLoading(false);
                         handleOpenDialog('Error al actualizar la contraseña. Verifica los datos e inténtalo de nuevo.');
                         setAlertError(true);
                     }
                 })
                     .catch(() => {
+                        setLoading(false);
                         handleOpenDialog('Error al intentar actualizar. Inténtalo de nuevo más tarde.');
                         setAlertError(true);
                     });
             }).catch(() => {
-                handleOpenDialog('Error al intentar actualizar. Inténtalo de nuevo más tarde.');
+                setLoading(false);
+                handleOpenDialog('Error interno del servidor. Inténtalo de nuevo más tarde.');
                 setAlertError(true);
             });
         }
     }
 
     return (
-        <div className="up-body">
-            <div className='up-componente'>
-                <h1 className='up-h1'>Cambio de contraseña</h1>
-                <form className="up-form" onSubmit={handleSubmit}>
-                    <div className="up-input">
-                        <InputPassword
-                            id='filled-password-input'
-                            label='Contraseña actual'
-                            value={currentPassword}
-                            onChange={handleCurrentPassword}
-                        />
-                        <InputPassword
-                            id='filled-password-input'
-                            label={error ? 'Error' : 'Nueva contraseña'}
-                            value={newPassword}
-                            error={error}
-                            helperText={error ? 'Los campos deben coincidir' : ''}
-                            onChange={handleNewPassword}
-                        />
-                        <InputPassword
-                            id='filled-password-input'
-                            label={error ? 'Error' : 'Confirmar contraseña'}
-                            value={confirmPassword}
-                            error={error}
-                            helperText={error ? 'Los campos deben coincidir' : ''}
-                            onChange={handleConfirmPassword}
-                        />
-                    </div>
-                    <div className="up-form-boton">
-                        <Button
-                            type="submit"
-                            className='boton-enviar'
-                            variant="contained"
-                            sx={{
-                                backgroundColor: 'rgb(38, 39, 31, 0.7)',
-                                "&:hover": {
-                                    backgroundColor: '#26271f'
-                                },
-                            }}
-                        >Guardar cambios</Button>
-                    </div>
-                </form>
+        <>
+            {loading && <CirculoEspera />}
+            <div className="up-body">
+                <div className='up-componente'>
+                    <h1 className='up-h1'>Cambio de contraseña</h1>
+                    <form className="up-form" onSubmit={handleSubmit}>
+                        <div className="up-input">
+                            <InputPassword
+                                id='filled-password-input'
+                                label='Contraseña actual'
+                                value={currentPassword}
+                                onChange={handleCurrentPassword}
+                            />
+                            <InputPassword
+                                id='filled-password-input'
+                                label={error ? 'Error' : 'Nueva contraseña'}
+                                value={newPassword}
+                                error={error}
+                                helperText={error ? 'Los campos deben coincidir' : ''}
+                                onChange={handleNewPassword}
+                            />
+                            <InputPassword
+                                id='filled-password-input'
+                                label={error ? 'Error' : 'Confirmar contraseña'}
+                                value={confirmPassword}
+                                error={error}
+                                helperText={error ? 'Los campos deben coincidir' : ''}
+                                onChange={handleConfirmPassword}
+                            />
+                        </div>
+                        <div className="up-form-boton">
+                            <Button
+                                type="submit"
+                                className='boton-enviar'
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: 'rgb(38, 39, 31, 0.7)',
+                                    "&:hover": {
+                                        backgroundColor: '#26271f'
+                                    },
+                                }}
+                            >Guardar cambios</Button>
+                        </div>
+                    </form>
+                </div>
+                <AlertDialog
+                    open={dialogOpen}
+                    onClose={handleCloseDialog}
+                    titulo={alertError ? 'Error' : ''}
+                    mensaje={message}
+                    error={alertError}
+                />
             </div>
-            <AlertDialog
-                open={dialogOpen}
-                onClose={handleCloseDialog}
-                titulo={alertError ? 'Error' : ''}
-                mensaje={message}
-                error={alertError}
-            />
-        </div>
+        </>
     )
 }

@@ -1,4 +1,4 @@
-import { AlertDialog, InputComponent, InputPassword } from '../../../museo/components';
+import { AlertDialog, InputComponent, InputPassword, CirculoEspera } from '../../../museo/components';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,7 @@ export const Login = () => {
     const [passwordError, setPasswordError] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -72,11 +73,11 @@ export const Login = () => {
         event.preventDefault();
         const credentialsAreValid = validateCredentials();
         if (credentialsAreValid) {
+            setLoading(true);
             await fetch('/sanctum/csrf-cookie', {
                 method: 'GET',
                 credentials: 'include'
-            });
-
+            })
             const api_url = 'http://localhost:8000/api';
             const data = { email, password };
 
@@ -89,68 +90,74 @@ export const Login = () => {
                 credentials: 'include'
             }).then(async (response) => {
                 await response.json().then((data) => {
-                    console.log(data)
                     if (data.success) {
                         setToken(data.user, data.token, data.role[0]);
+                        setLoading(false);
                         navigate('/');
                     } else {
+                        setLoading(false);
                         handleOpenDialog('El correo o la contraseña son incorrectos. Inténtalo de nuevo.');
                     }
                 })
                     .catch(() => {
+                        setLoading(false);
                         handleOpenDialog('Error al intentar iniciar sesión. Inténtalo de nuevo más tarde.');
                     });
             }).catch(() => {
-                handleOpenDialog('Error al intentar iniciar sesión. Inténtalo de nuevo más tarde.');
+                setLoading(false);
+                handleOpenDialog('Error interno del servidor. Inténtalo de nuevo más tarde.');
             });
         }
     }
 
     return (
-        <div className="lg-body">
-            <div className='lg-componente'>
-                <h1>¡Bienvenido!</h1>
-                <h3>Introduce tus datos para iniciar sesión</h3>
-                <img className='img-datos-usuario' src='/storage/assets/imgs/account_circle_white.svg' />
-                <form className="form" onSubmit={handleSubmit}>
-                    <InputComponent
-                        id='filled-email-input'
-                        label={emailError ? 'Error' : 'Correo electrónico'}
-                        value={email}
-                        onChange={handleEmailChange}
-                        helperText={emailErrorMessage}
-                        error={emailError}
-                    />
-                    <InputPassword
-                        id='filled-password-input'
-                        onChange={handlePasswordChange}
-                        value={password}
-                        error={passwordError}
-                        label={passwordError ? 'Error' : 'Contraseña'}
-                        helperText={passwordError ? 'Este campo es obligatorio' : ''}
-                    />
-                    <div className="form-boton">
-                        <Button
-                            type="submit"
-                            className='boton-enviar'
-                            variant="contained"
-                            sx={{
-                                backgroundColor: 'rgb(38, 39, 31, 0.7)',
-                                "&:hover": {
-                                    backgroundColor: '#26271f'
-                                },
-                            }}
-                        >Ingresar</Button>
-                    </div>
-                </form>
+        <>
+            {loading && <CirculoEspera />}
+            <div className="lg-body">
+                <div className='lg-componente'>
+                    <h1>¡Bienvenido!</h1>
+                    <h3>Introduce tus datos para iniciar sesión</h3>
+                    <img className='img-datos-usuario' src='/storage/assets/imgs/account_circle_white.svg' />
+                    <form className="form" onSubmit={handleSubmit}>
+                        <InputComponent
+                            id='filled-email-input'
+                            label={emailError ? 'Error' : 'Correo electrónico'}
+                            value={email}
+                            onChange={handleEmailChange}
+                            helperText={emailErrorMessage}
+                            error={emailError}
+                        />
+                        <InputPassword
+                            id='filled-password-input'
+                            onChange={handlePasswordChange}
+                            value={password}
+                            error={passwordError}
+                            label={passwordError ? 'Error' : 'Contraseña'}
+                            helperText={passwordError ? 'Este campo es obligatorio' : ''}
+                        />
+                        <div className="form-boton">
+                            <Button
+                                type="submit"
+                                className='boton-enviar'
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: 'rgb(38, 39, 31, 0.7)',
+                                    "&:hover": {
+                                        backgroundColor: '#26271f'
+                                    },
+                                }}
+                            >Ingresar</Button>
+                        </div>
+                    </form>
+                </div>
+                <AlertDialog
+                    open={dialogOpen}
+                    onClose={handleCloseDialog}
+                    titulo="Error"
+                    mensaje={errorMessage}
+                    error={true}
+                />
             </div>
-            <AlertDialog
-                open={dialogOpen}
-                onClose={handleCloseDialog}
-                titulo="Error"
-                mensaje={errorMessage}
-                error={true}
-            />
-        </div>
+        </>
     )
 }

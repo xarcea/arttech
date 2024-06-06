@@ -22,15 +22,19 @@ class UserController extends Controller
         $user = User::find($id);
         if ($user) {
             $data = [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'employee_id' => $user->employee_id,
-                'role' => $user->role
+                'user' => [
+                    'email' => $user->email,
+                    'employee_id' => $user->employee_id,
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'role' => $user->role,
+                    'avatar' => $user->file ? $user->file->path : null
+                ],
+                'success' => true
             ];
             return response()->json($data, 200);
         } else {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found', 'success' => false], 404);
         }
     }
 
@@ -145,9 +149,11 @@ class UserController extends Controller
                 [
                     'message' => 'Current password and new password are required',
                     'success' => false
-                ], 422);
+                ],
+                422
+            );
         }
-        
+
         $request->validate([
             'current_password' => 'required|string',
             'new_password' => 'required|string'
@@ -158,7 +164,9 @@ class UserController extends Controller
                 [
                     'message' => 'Data is incorrect',
                     'success' => false
-                ], 401);
+                ],
+                401
+            );
         }
 
         $user->password = bcrypt($request->input('new_password'));

@@ -1,6 +1,6 @@
-import { AlertDialog, ImageAvatars } from '../../components'
+import { AlertDialog, CirculoEspera, ImageAvatars } from '../../components'
 import { AuthUser } from '../../../auth/components';
-import { Button } from '@mui/material';
+import { Alert, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import { useRef, useState } from 'react';
@@ -12,8 +12,9 @@ export const HomePage = () => {
     const [message, setMessage] = useState('');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const { user, getRole, getToken } = AuthUser();
+    const { user, getRole, getToken, setToken } = AuthUser();
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
 
@@ -28,12 +29,12 @@ export const HomePage = () => {
             return;
         }
 
-        if(selectedFile.size > 1000000) {
+        if (selectedFile.size > 1000000) {
             setMessage('El archivo es demasiado grande. Por favor seleccione un archivo de menos de 1MB.');
             return;
         }
 
-        if(!selectedFile.type.includes('image')) {
+        if (!selectedFile.type.includes('image')) {
             setMessage('Por favor seleccione un archivo de imagen.');
             return;
         }
@@ -43,6 +44,7 @@ export const HomePage = () => {
         formData.append('user_id', user.id);
 
         try {
+            setLoading(true);
             const api_url = 'http://localhost:8000/api';
             await axios.get('/sanctum/csrf-cookie');
             const response = await axios.post(`${api_url}/empleado/archivo`, formData, {
@@ -52,15 +54,36 @@ export const HomePage = () => {
                 }
             });
             if (response.data.success) {
-                setSelectedFile(null);
-                handleOpenDialog('La foto se actualizó correctamente. Los cambios se verán reflejados en la siguiente sesión');
+                await axios.get(`${api_url}/empleados/${user.id}`, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${getToken()}`
+                    }
+                }).then((response) => {
+                    if (response.data.success) {
+                        setToken(response.data.user, getToken(), getRole());
+                        setSelectedFile(null);
+                        setLoading(false);
+                        handleOpenDialog('La foto se actualizó correctamente.');
+                    } else {
+                        setSelectedFile(null);
+                        setLoading(false);
+                        handleOpenDialog('La foto se actualizó correctamente. Los cambios se verán reflejados la próxima vez que inicies sesión.');
+                    }
+                }).catch(() => {
+                    setSelectedFile(null);
+                    setLoading(false);
+                    handleOpenDialog('La foto se actualizó correctamente. Los cambios se verán reflejados la próxima vez que inicies sesión.');
+                });
             } else {
                 console.log(response.data.message);
                 setSelectedFile(null);
+                setLoading(false);
                 setMessage('Error al subir el archivo.');
             }
         } catch (error) {
             setSelectedFile(null);
+            setLoading(false);
             setMessage('Error al subir el archivo.');
             console.error(error);
         }
@@ -79,7 +102,7 @@ export const HomePage = () => {
         if (getRole() === 'admin') {
             return (
                 <>
-                    <AlertDialog 
+                    <AlertDialog
                         open={dialogOpen}
                         onClose={handleCloseDialog}
                         titulo="Foto actualizada"
@@ -101,10 +124,10 @@ export const HomePage = () => {
                             }}
                         >Actualizar foto de perfil</Button>
                         {selectedFile &&
-                            <p>{selectedFile.name}</p>
+                            <Alert severity="info">{selectedFile.name}</Alert>
                         }
                     </Box>
-                    {message && <p>{message}</p>}
+                    {message && <Alert severity="error">{message}</Alert>}
                     {selectedFile && !message &&
                         <Button
                             onClick={handleUpload}
@@ -125,41 +148,45 @@ export const HomePage = () => {
     }
 
     return (
-        <div className='hp-componente'>
-            <div className="h1">
-                <h1>{user.role}</h1>
-            </div>
-            <div className="hp-gap">
-                <div className="datos-usuario">
-                    <ImageAvatars
-                        name={user.name}
-                        avatar={user.avatar}
-                        size='200px'
-                        fontSize='4rem'
-                    />
-                    <div className="datos-usuario-texto">
-                        <h2>Nombre: {user.name}</h2>
-                        <h2>ID de empleado: {user.employee_id}</h2>
-                        <h2>Correo electrónico: {user.email}</h2>
+        <>
+            {loading && <CirculoEspera />}
+            <div className='hp-componente'>
+
+                <div className="h1">
+                    <h1>{user.role}</h1>
+                </div>
+                <div className="hp-gap">
+                    <div className="datos-usuario">
+                        <ImageAvatars
+                            name={user.name}
+                            avatar={user.avatar}
+                            size='200px'
+                            fontSize='4rem'
+                        />
+                        <div className="datos-usuario-texto">
+                            <h2>Nombre: {user.name}</h2>
+                            <h2>ID de empleado: {user.employee_id}</h2>
+                            <h2>Correo electrónico: {user.email}</h2>
+                        </div>
+                    </div>
+                    <div className="hp-button">
+                        <Button
+                            type="submit"
+                            className='boton-enviar'
+                            variant="contained"
+                            sx={{
+                                backgroundColor: '#ddd4c3',
+                                "&:hover": {
+                                    backgroundColor: '#ddd4c3'
+                                },
+                                color: 'black',
+                            }}
+                            onClick={() => navigate('/update-password')}
+                        >Cambiar contraseña</Button>
+                        {renderBoton()}
                     </div>
                 </div>
-                <div className="hp-button">
-                    <Button
-                        type="submit"
-                        className='boton-enviar'
-                        variant="contained"
-                        sx={{
-                            backgroundColor: '#ddd4c3',
-                            "&:hover": {
-                                backgroundColor: '#ddd4c3'
-                            },
-                            color: 'black',
-                        }}
-                        onClick={() => navigate('/update-password')}
-                    >Cambiar contraseña</Button>
-                    {renderBoton()}
-                </div>
             </div>
-        </div>
+        </>
     )
 }

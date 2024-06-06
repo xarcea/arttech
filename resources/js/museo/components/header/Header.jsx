@@ -11,12 +11,14 @@ import { AuthUser } from '../../../auth/components';
 import { Typography } from '@mui/material';
 import { ImageAvatars } from '../ImageAvatars';
 import { SideBar } from '../SideBar';
+import { CirculoEspera } from '../CirculoEspera';
 
 import './header.css';
 
 export const Header = () => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
 
     const { getToken, getLogout, user } = AuthUser();
     const navigate = useNavigate();
@@ -24,8 +26,8 @@ export const Header = () => {
     const logoutUser = async () => {
         if (getToken()) {
             try {
+                setLoading(true);
                 const api_url = 'http://localhost:8000/api';
-                await axios.get('/sanctum/csrf-cookie');
                 const response = await axios.post(`${api_url}/logout`, {}, {
                     headers: {
                         'Authorization': `Bearer ${getToken()}`
@@ -33,11 +35,14 @@ export const Header = () => {
                 });
 
                 if (response.data.success) {
+                    setLoading(false);
                     getLogout();
                 } else {
+                    setLoading(false);
                     console.log(response.data.message);
                 }
             } catch (error) {
+                setLoading(false);
                 console.error('Error during logout:', error);
             }
         } else {
@@ -67,6 +72,7 @@ export const Header = () => {
 
     return (
         <>
+            {loading && <CirculoEspera />}
             <SideBar open={drawerOpen} toggleDrawer={toggleDrawer} />
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static" sx={{ position: 'fixed' }}>
