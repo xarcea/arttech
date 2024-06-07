@@ -111,7 +111,7 @@ export const Login = () => {
             <div className='lg-componente'>
                 <h1>¡Bienvenido!</h1>
                 <h3>Introduce tus datos para iniciar sesión</h3>
-                <img className='img-datos-usuario' src='/storage/assets/imgs/account_circle_white.svg' />
+                <img className='img-datos-usuario' src='/storage/app/public/assets/imgs/account_circle.svg' />
                 <form className="form" onSubmit={handleSubmit}>
                     <InputComponent
                         id='filled-email-input'

@@ -24,12 +24,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group([], function () {
     //públicas
     Route::post('/login', [AuthController::class, 'login']);
-    
+
     //privadas
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::put('/update-password', [UserController::class, 'updatePassword']);
-        
+
         //administrador
         Route::post('/empleado/archivo', [FileUserController::class, 'store']);
         Route::apiResource('/empleados', UserController::class);
