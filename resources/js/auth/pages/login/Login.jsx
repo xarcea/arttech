@@ -126,6 +126,8 @@ export const Login = () => {
                             onChange={handleEmailChange}
                             helperText={emailErrorMessage}
                             error={emailError}
+                            icon
+                            complete
                         />
                         <InputPassword
                             id='filled-password-input'

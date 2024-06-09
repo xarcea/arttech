@@ -6,13 +6,13 @@ export const CirculoEspera = () => {
     return (
         <Box sx={{
             display: 'flex',
-            height: '100vh',
+            height: '100%',
             position: 'fixed',
             width: '100%',
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            zIndex: 1000,
+            zIndex: 3000,
             }}>
             <CircularProgress color='secondary' size='4rem' thickness={4} />
         </Box>

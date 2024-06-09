@@ -8,13 +8,14 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     public function index() {
         $data = User::whereDoesntHave('roles', function ($query) {
             $query->where('name', 'admin');
-        })->get(['id', 'name', 'email', 'employee_id', 'role']);
+        })->get(['id', 'name', 'email', 'employee_id', 'role', 'birthday', 'phone_number']);
         return response()->json($data, 200);
     }
 
@@ -28,7 +29,9 @@ class UserController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'role' => $user->role,
-                    'avatar' => $user->file ? $user->file->path : null
+                    'avatar' => $user->file ? $user->file->path : null,
+                    'birthday' => $user->birthday,
+                    'phone_number' => $user->phone_number
                 ],
                 'success' => true
             ];
@@ -42,7 +45,7 @@ class UserController extends Controller
         $data = User::find($id);
 
         if (!$data) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found', 'success' => false], 404);
         }
 
         if (
@@ -51,8 +54,9 @@ class UserController extends Controller
             && !$request->has('employee_id')
             && !$request->has('role')
             && !$request->has('rol')
+            && !$request->has('phone_number')
         ) {
-            return response()->json(['message' => 'No fields to update provided'], 422);
+            return response()->json(['message' => 'No fields to update provided', 'success' => false], 422);
         }
 
         try {
@@ -61,24 +65,30 @@ class UserController extends Controller
                 'email' => 'sometimes|required|email',
                 'employee_id' => 'sometimes|required|string',
                 'role' => 'sometimes|required|string',
-                'rol' => 'sometimes|required|string|exists:roles,name'
+                'rol' => 'sometimes|required|string|exists:roles,name',
+                'phone_number' => 'sometimes|required|string'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['errors' => $e->errors()], 422);
+            return response()->json(['errors' => $e->errors(), 'success' => false], 422);
         }
 
-        $data->fill($request->only(['name', 'email', 'employee_id', 'role']));
+        $data->fill($request->only(['name', 'email', 'employee_id', 'role', 'phone_number']));
         if ($request->has('rol')) {
             $role = Role::where('name', $request->input('rol'))->first();
 
             if ($role) {
                 $data->syncRoles([$role]);
             } else {
-                return response()->json(['message' => 'Role not found'], 404);
+                return response()->json(['message' => 'Role not found', 'success' => false], 404);
             }
         }
         $data->save();
-        return response()->json($data, 200);
+        $response = [
+            'message' => 'User updated',
+            'success' => true,
+            'user' => $data
+        ];
+        return response()->json($response, 200);
     }
 
     public function store(Request $request) {
@@ -88,11 +98,13 @@ class UserController extends Controller
             'password' => 'required|string',
             'employee_id' => 'required|string',
             'role' => 'required|string',
-            'rol' => 'required|string|exists:roles,name'
+            'rol' => 'required|string|exists:roles,name',
+            'birthday' => 'required|date',
+            'phone_number' => 'required|string'
         ]);
 
         if ($validator->fails()) {
-            $response = ['error' => $validator->errors()];
+            $response = ['error' => $validator->errors(), 'success' => false];
             return response()->json($response, 400);
         }
 
@@ -113,21 +125,26 @@ class UserController extends Controller
         return response()->json([
             $request,
             'message' => 'Usuario creado exitosamente',
-            'user' => $user
+            'user' => $user,
+            'success' => true
         ], 200);
     }
 
     public function destroy($id) {
         $user = User::find($id);
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found', 'success' => false], 404);
         }
         if ($user->hasRole('admin')) {
-            return response()->json(['message' => 'Cannot delete user with admin role'], 403);
+            return response()->json(['message' => 'Cannot delete user with admin role', 'success' => false], 403);
+        }
+        if ($user->file) {
+            Storage::delete('public/assets/imgs/avatar/' . $user->file->filename);
+            $user->file->delete();
         }
         $user->roles()->detach();
         $user->delete();
-        return response()->json(['message' => 'User deleted'], 200);
+        return response()->json(['message' => 'User deleted', 'success' => true], 200);
     }
 
     public function updatePassword(Request $request) {

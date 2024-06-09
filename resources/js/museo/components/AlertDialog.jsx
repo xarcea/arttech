@@ -11,7 +11,7 @@ export const AlertDialog = ({ open, onClose, titulo, mensaje, error }) => {
     const temaBoton = error ? 'rgb(211, 47, 47)' : 'rgb(154, 209, 133)';
     const temaTexto = error ? '#ffff' : '#000000';
     return (
-        <React.Fragment>
+        <>
             <Dialog
                 open={open}
                 onClose={onClose}
@@ -32,6 +32,6 @@ export const AlertDialog = ({ open, onClose, titulo, mensaje, error }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </React.Fragment>
+        </>
     );
 }

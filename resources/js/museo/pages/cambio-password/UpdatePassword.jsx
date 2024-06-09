@@ -3,7 +3,7 @@ import { AlertDialog, CirculoEspera, InputPassword } from '../../components'
 import { Button } from '@mui/material'
 import { AuthUser } from '../../../auth/components'
 
-import './updatePassword.css'
+import './update-password.css'
 
 export const UpdatePassword = () => {
     const [currentPassword, setCurrentPassword] = useState('')

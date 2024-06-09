@@ -1,2 +1,5 @@
 export * from './home/HomePage'
-export * from './cambioPassword/UpdatePassword'
+export * from './cambio-password/UpdatePassword'
+export * from './lista-empleados/ListaEmpleados'
+export * from './empleados/Empleados'
+export * from './agregar-empleado/AgregarEmpleado'

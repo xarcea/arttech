@@ -98,62 +98,13 @@ export const HomePage = () => {
         setDialogOpen(false);
     };
 
-    const renderBoton = () => {
-        if (getRole() === 'admin') {
-            return (
-                <>
-                    <AlertDialog
-                        open={dialogOpen}
-                        onClose={handleCloseDialog}
-                        titulo="Foto actualizada"
-                        mensaje={successMessage}
-                        error={false}
-                    />
-                    <Box sx={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                        <input type="file" onChange={handleFileChange} style={{ display: 'none' }} ref={fileInputRef} />
-                        <Button
-                            onClick={() => fileInputRef.current.click()}
-                            className='boton-enviar'
-                            variant="contained"
-                            sx={{
-                                backgroundColor: '#ddd4c3',
-                                "&:hover": {
-                                    backgroundColor: '#ddd4c3'
-                                },
-                                color: 'black',
-                            }}
-                        >Actualizar foto de perfil</Button>
-                        {selectedFile &&
-                            <Alert severity="info">{selectedFile.name}</Alert>
-                        }
-                    </Box>
-                    {message && <Alert severity="error">{message}</Alert>}
-                    {selectedFile && !message &&
-                        <Button
-                            onClick={handleUpload}
-                            className='boton-enviar'
-                            variant="contained"
-                            sx={{
-                                backgroundColor: '#ddd4c3',
-                                "&:hover": {
-                                    backgroundColor: '#ddd4c3'
-                                },
-                                color: 'black',
-                            }}
-                        >Subir archivo</Button>
-                    }
-                </>
-            )
-        }
-    }
-
     return (
         <>
             {loading && <CirculoEspera />}
             <div className='hp-componente'>
 
-                <div className="h1">
-                    <h1>{user.role}</h1>
+                <div className="hp-div-h1">
+                    <h1 className='hp-h1'>{user.role}</h1>
                 </div>
                 <div className="hp-gap">
                     <div className="datos-usuario">
@@ -183,7 +134,48 @@ export const HomePage = () => {
                             }}
                             onClick={() => navigate('/update-password')}
                         >Cambiar contraseña</Button>
-                        {renderBoton()}
+                        <>
+                            <AlertDialog
+                                open={dialogOpen}
+                                onClose={handleCloseDialog}
+                                titulo="Foto actualizada"
+                                mensaje={successMessage}
+                                error={false}
+                            />
+                            <Box sx={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                                <input type="file" onChange={handleFileChange} style={{ display: 'none' }} ref={fileInputRef} />
+                                <Button
+                                    onClick={() => fileInputRef.current.click()}
+                                    className='boton-enviar'
+                                    variant="contained"
+                                    sx={{
+                                        backgroundColor: '#ddd4c3',
+                                        "&:hover": {
+                                            backgroundColor: '#ddd4c3'
+                                        },
+                                        color: 'black',
+                                    }}
+                                >Actualizar foto de perfil</Button>
+                                {selectedFile &&
+                                    <Alert severity="info">{selectedFile.name}</Alert>
+                                }
+                            </Box>
+                            {message && <Alert severity="error">{message}</Alert>}
+                            {selectedFile && !message &&
+                                <Button
+                                    onClick={handleUpload}
+                                    className='boton-enviar'
+                                    variant="contained"
+                                    sx={{
+                                        backgroundColor: '#ddd4c3',
+                                        "&:hover": {
+                                            backgroundColor: '#ddd4c3'
+                                        },
+                                        color: 'black',
+                                    }}
+                                >Subir archivo</Button>
+                            }
+                        </>
                     </div>
                 </div>
             </div>

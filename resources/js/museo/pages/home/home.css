@@ -20,11 +20,11 @@
     height: 200px;
 }
 
-h1 {
+.hp-h1 {
     text-align: center;
 }
 
-.h1 {
+.hp-div-h1 {
     width: 100%;
     display: flex;
     justify-content: center;

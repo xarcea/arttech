@@ -1,6 +1,6 @@
 import React from 'react'
 import { Routes, Route, Navigate, BrowserRouter as Router } from 'react-router-dom'
-import { HomePage, UpdatePassword } from '../museo/pages'
+import { Empleados, HomePage, UpdatePassword } from '../museo/pages'
 import { Login } from '../auth/pages'
 import { ProtectedRouter } from '../auth/router'
 import { LayoutAdmin, LayoutCoordinador, LayoutEmpleado } from '../auth/layouts'
@@ -15,7 +15,7 @@ export const AppRouter = () => {
                         <Route path="/home" element={<HomePage />} />
                         <Route path="/update-password" element={<UpdatePassword />} />
                         <Route element={<LayoutAdmin />} >
-                            <Route path="/empleados" element={<div>Empleados</div>} />
+                            <Route path="/empleados" element={<Empleados />} />
                         </Route>
                         <Route element={<LayoutCoordinador />} >
 

@@ -1,0 +1,24 @@
+.ae-componente {
+    display: flex;
+    flex-direction: column;
+    background-color: #b5aa98;
+    width: fit-content;
+    height: fit-content;
+    padding: 0px 20px 20px 20px;
+    align-items: center;
+    color: white;
+}
+
+.ae-body {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.ae-form-boton {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}

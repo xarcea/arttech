@@ -75,7 +75,7 @@ export const Header = () => {
             {loading && <CirculoEspera />}
             <SideBar open={drawerOpen} toggleDrawer={toggleDrawer} />
             <Box sx={{ flexGrow: 1 }}>
-                <AppBar position="static" sx={{ position: 'fixed' }}>
+                <AppBar position="static" sx={{ position: 'fixed', zIndex: 1000 }}>
                     <Toolbar sx={{
                         backgroundColor: '#79553d',
                         display: 'flex',

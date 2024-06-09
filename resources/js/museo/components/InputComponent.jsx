@@ -6,7 +6,7 @@ import { FilledInput, FormHelperText } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 
-export const InputComponent = ({ id, label, helperText, error, onChange, value }) => {
+export const InputComponent = ({ id, label, helperText, error, onChange, value, icon, complete }) => {
     return (
         <Box autoComplete="off">
             <div>
@@ -26,7 +26,8 @@ export const InputComponent = ({ id, label, helperText, error, onChange, value }
                         id={id}
                         onChange={onChange}
                         value={value}
-                        endAdornment={<InputAdornment position="end"><AlternateEmailIcon /></InputAdornment>}
+                        inputProps={{ autoComplete: complete ? 'on' : 'off' }}
+                        endAdornment={icon ? <InputAdornment position="end"><AlternateEmailIcon /></InputAdornment> : null}
                     />
                     <FormHelperText error>{helperText}</FormHelperText>
                 </FormControl>
