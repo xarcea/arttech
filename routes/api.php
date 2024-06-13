@@ -35,18 +35,24 @@ Route::group([], function () {
         Route::apiResource('/empleados', UserController::class);
 
         //empleados
-        Route::apiResource('/items', ItemController::class);
-        Route::apiResource('/tareas', TareaControllerEmpleado::class);
-        Route::apiResource('/bitacoras', BitacoraControllerEmpleado::class);
-        Route::apiResource('/eventos', EventoControllerEmpleado::class);
-        Route::apiResource('/actividades', ActividadControllerEmpleado::class);
-        Route::apiResource('/archivos', ArchivoControllerEmpleado::class);
+        Route::get('/empleado/tareas/{id}', [TareaControllerEmpleado::class, 'index']);
+        Route::put('/empleado/tareas/{id}', [TareaControllerEmpleado::class, 'update']);
+
+        Route::apiResource('/empleado/items', ItemController::class);
+        Route::apiResource('/empleado/bitacoras', BitacoraControllerEmpleado::class);
+        Route::apiResource('/empleado/eventos', EventoControllerEmpleado::class);
+        Route::apiResource('/empleado/actividades', ActividadControllerEmpleado::class);
+        Route::apiResource('/empleado/archivos', ArchivoControllerEmpleado::class);
 
         //coordinadores
-        Route::apiResource('/tareas', TareaControllerCoordinador::class);
-        Route::apiResource('/bitacoras', BitacoraControllerCoordinador::class);
-        Route::apiResource('/eventos', EventoControllerCoordinador::class);
-        Route::apiResource('/actividades', ActividadControllerCoordinador::class);
-        Route::apiResource('/archivos', ArchivoControllerCoordinador::class);
+        Route::post('/coordinador/tareas', [TareaControllerCoordinador::class, 'store']);
+        Route::get('/coordinador/tareas/{id}', [TareaControllerCoordinador::class, 'index']);
+        Route::put('/coordinador/tareas/{id}', [TareaControllerCoordinador::class, 'update']);
+        Route::delete('/coordinador/tareas/{id}', [TareaControllerCoordinador::class, 'destroy']);
+
+        Route::apiResource('/coordinador/bitacoras', BitacoraControllerCoordinador::class);
+        Route::apiResource('/coordinador/eventos', EventoControllerCoordinador::class);
+        Route::apiResource('/coordinador/actividades', ActividadControllerCoordinador::class);
+        Route::apiResource('/coordinador/archivos', ArchivoControllerCoordinador::class);
     });
 });

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Routes, Route, Navigate, BrowserRouter as Router } from 'react-router-dom'
-import { Empleados, HomePage, UpdatePassword } from '../museo/pages'
+import { AsignarTarea, Empleados, HomePage, Items, UpdatePassword, Tareas, ChecklistTareas } from '../museo/pages'
 import { Login } from '../auth/pages'
 import { ProtectedRouter } from '../auth/router'
 import { LayoutAdmin, LayoutCoordinador, LayoutEmpleado } from '../auth/layouts'
@@ -18,10 +18,11 @@ export const AppRouter = () => {
                             <Route path="/empleados" element={<Empleados />} />
                         </Route>
                         <Route element={<LayoutCoordinador />} >
-
+                            <Route path="/tareas" element={<Tareas />} />
+                            <Route path="/asignar-tarea" element={<AsignarTarea />} />
                         </Route>
                         <Route element={<LayoutEmpleado />} >
-
+                            <Route path="/tareas-asignadas" element={<ChecklistTareas />} />
                         </Route>
                     </Route>
                 </Route>

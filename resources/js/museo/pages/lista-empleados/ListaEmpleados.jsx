@@ -6,7 +6,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { esES } from '@mui/x-data-grid/locales';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { AlertDialog, CirculoEspera, ConfirmationDialog, FormDialog, SkeletonListaEmpleados } from '../../components';
+import { AlertDialog, CirculoEspera, ConfirmationDialog, FormDialog, SkeletonTabla } from '../../components';
 
 const theme = createTheme(
     {
@@ -16,7 +16,6 @@ const theme = createTheme(
     },
     esES,
 );
-
 
 function convertirFormatoFecha(fechaString) {
     // Divide la fecha en sus partes (año, mes, día)
@@ -28,14 +27,14 @@ function convertirFormatoFecha(fechaString) {
     return fechaFormateada;
 }
 
-export const ListaEmpleados = () => {
+export const ListaEmpleados = () => { // TODO: hacer pruebas de modificación y eliminación de empleados
     const [rows, setRows] = React.useState([])
     const [formDialogOpen, setFormDialogOpen] = React.useState(false);
     const [confDialogOpen, setConfDialogOpen] = React.useState(false);
     const [selectedRow, setSelectedRow] = React.useState({})
     const [loading, setLoading] = React.useState(false);
     const [actualizado, setActualizado] = React.useState(false);
-    const [esqueleto, setEsqueleto] = React.useState(false);
+    const [esqueleto, setEsqueleto] = React.useState(true);
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [mensaje, setMensaje] = React.useState('');
     const [error, setError] = React.useState(false);
@@ -52,7 +51,6 @@ export const ListaEmpleados = () => {
 
         window.addEventListener('resize', handleResize);
 
-        // Cleanup function to remove the event listener
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -220,7 +218,7 @@ export const ListaEmpleados = () => {
     const renderPage = () => {
         if (esqueleto) {
             return (
-                <SkeletonListaEmpleados />
+                <SkeletonTabla />
             )
         } else {
             return (
@@ -238,6 +236,7 @@ export const ListaEmpleados = () => {
                         user={selectedRow}
                         manejarLoading={manejarLoadingDesdeHijo}
                         manejarActualizado={manejarActualizadoDesdeHijo}
+                        componente={'empleado'}
                     />
                     <ConfirmationDialog
                         open={confDialogOpen}

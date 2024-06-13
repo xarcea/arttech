@@ -15,12 +15,12 @@ class Task extends Model
     protected $fillable = ['description', 'completed', 'assignment_date', 'due_date'];
 
     public function assignedUsers() {
-        return $this->belongsToMany(User::class, 'user_task', 'task_id', 'assigned_to')
+        return $this->belongsToMany(User::class, 'user_tasks', 'task_id', 'assigned_to')
             ->withPivot('assigned_by');
     }
 
     public function assigningUsers() {
-        return $this->belongsToMany(User::class, 'user_task', 'task_id', 'assigned_by')
+        return $this->belongsToMany(User::class, 'user_tasks', 'task_id', 'assigned_by')
             ->withPivot('assigned_to');
     }
 }

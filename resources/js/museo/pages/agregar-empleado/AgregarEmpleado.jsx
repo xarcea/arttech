@@ -62,10 +62,11 @@ export const AgregarEmpleado = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (nombre === '' || email === '' || password === '' || id === '' || puesto === '' || birthday === '' || telefono === '') {
-            return;
-            }
+            alert('Todos los campos son obligatorios')
+            return
+        }
         const fecha = convertirFechaParaMySQL(birthday);
-        if(fecha === null) {
+        if (fecha === null) {
             setDateError(true);
             return;
         }
@@ -154,7 +155,7 @@ export const AgregarEmpleado = () => {
     return (
         <>
             {loading && <CirculoEspera />}
-            <Box sx={{ p: 3, padding: '1rem 5rem 1rem 5rem'}}>
+            <Box sx={{ p: 3, padding: '1rem 5rem 1rem 5rem' }}>
                 <div className="ae-body">
                     <div className='ae-componente'>
                         <h1>Nuevo registro</h1>

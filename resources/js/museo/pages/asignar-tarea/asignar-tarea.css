@@ -1,0 +1,65 @@
+.at-form {
+    border-radius: 5px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    background-color: #b5aa98;
+    width: fit-content;
+    height: fit-content;
+    padding: 0px 32px 20px 20px;
+    align-items: center;
+    color: white;
+    gap: 1rem;
+}
+
+.at-body {
+    padding-top: 72px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.at-h2 {
+    width: 100%;
+    text-align: left;
+    margin-left: 15px;
+}
+
+.at-fieldset {
+    border: none;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    gap: .5rem;
+}
+
+.at-fieldset-fecha {
+    border: none;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    gap: 1rem;
+}
+
+.at-label {
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.at-label-fecha {
+    font-weight: bold;
+    margin-left: 3px;
+}
+
+.at-boton-enviar {
+    width: fit-content;
+}
+
+.at-form-boton {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}

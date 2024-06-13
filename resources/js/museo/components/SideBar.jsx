@@ -15,14 +15,15 @@ import HomeIcon from '@mui/icons-material/Home';
 import { AuthUser } from '../../auth/components';
 import { useNavigate } from 'react-router-dom';
 
-function modificarString(cadena) {
-    cadena = cadena.toLowerCase();
-    return cadena.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
-export const SideBar = ({ open, toggleDrawer }) => {
+export const SideBar = ({ open, toggleDrawer }) => { //TODO: probar que funcionen todos los links
     const { role } = AuthUser();
     const navigate = useNavigate();
+
+    const modificarString = (cadena) => {
+        if(role=='empleado' && cadena=='Tareas') return 'tareas-asignadas';
+        cadena = cadena.toLowerCase();
+        return cadena.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
 
     const iconMap = {
         'Tareas': <AssignmentIcon sx={{ color: '#ffff', fontSize: 30 }} />,

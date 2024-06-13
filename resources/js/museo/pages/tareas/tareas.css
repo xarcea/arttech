@@ -1,0 +1,32 @@
+.tr-body {
+    padding-top: 72px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.tr-tabla {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 2rem;
+}
+
+.tr-h1{
+    width: 100%;
+    text-align: left;
+}
+
+.tr-boton-enviar {
+    width: fit-content;
+}
+
+.tr-form-boton {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}

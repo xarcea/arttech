@@ -7,14 +7,16 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { InputComponent } from './InputComponent';
 import { AuthUser } from '../../auth/components';
 import { AlertDialog } from './AlertDialog';
+import { SelectorFecha } from './SelectorFecha';
 
-export const FormDialog = ({ open, onClose, user, manejarLoading, manejarActualizado }) => {
+export const FormDialog = ({ open, onClose, user, manejarLoading, manejarActualizado, componente, manejarFecha }) => {
     const [email, setEmail] = React.useState('');
     const [telefono, setTelefono] = React.useState('');
     const [puesto, setPuesto] = React.useState('');
     const [mensaje, setMensaje] = React.useState('');
     const [error, setError] = React.useState(false);
     const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [fecha, setFecha] = React.useState(null);
 
     const { getToken } = AuthUser();
 
@@ -46,9 +48,14 @@ export const FormDialog = ({ open, onClose, user, manejarLoading, manejarActuali
         setTelefono(event.target.value);
     }
 
+    const handleFechaChange = (fecha) => {
+        setFecha(fecha);
+        manejarFecha(fecha)
+    }
+
     const handleCloseDialog = () => {
         setDialogOpen(false);
-        if(!error) {
+        if (!error) {
             enviarActualizadoAlPadre(true);
         }
     };
@@ -69,6 +76,14 @@ export const FormDialog = ({ open, onClose, user, manejarLoading, manejarActuali
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if(componente === 'tarea') {
+            if(!fecha) {
+                alert('Debes seleccionar una fecha');
+            } else {
+                manejarLoading(true)
+            }
+            return;
+        }
         const rolApp = getRole(puesto)
         enviarLoadingAlPadre(true)
         const api_url = 'http://localhost:8000/api';
@@ -109,21 +124,10 @@ export const FormDialog = ({ open, onClose, user, manejarLoading, manejarActuali
         });
     }
 
-    return (
-        <>
-            <AlertDialog
-                open={dialogOpen}
-                onClose={handleCloseDialog}
-                titulo={error ? "Error" : "Éxito"}
-                mensaje={mensaje}
-                error={error}
-            />
-            <Dialog
-                open={open}
-                onClose={onClose}
-            >
-                <DialogTitle sx={{ backgroundColor: '#b5aa98', color: '#ffff' }}>Editar datos de {user.name}</DialogTitle>
-                <DialogContent sx={{ backgroundColor: '#b5aa98', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    const renderInputs = () => {
+        if (componente === 'empleado') {
+            return (
+                <>
                     <InputComponent
                         id='filled-email-input'
                         label='Correo electrónico'
@@ -148,6 +152,38 @@ export const FormDialog = ({ open, onClose, user, manejarLoading, manejarActuali
                         icon={false}
                         complete={false}
                     />
+                </>
+            )
+        } else {
+            return (
+                <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <label style={{ fontEeight: 'bold', marginLeft: '3px', color: '#ffffff' }}>Fecha de vencimiento</label>
+                        <SelectorFecha
+                            manejarFecha={handleFechaChange}
+                        />
+                    </div>
+                </>
+            )
+        }
+    }
+
+    return (
+        <>
+            <AlertDialog
+                open={dialogOpen}
+                onClose={handleCloseDialog}
+                titulo={error ? "Error" : "Éxito"}
+                mensaje={mensaje}
+                error={error}
+            />
+            <Dialog
+                open={open}
+                onClose={onClose}
+            >
+                <DialogTitle sx={{ backgroundColor: '#b5aa98', color: '#ffff' }}>{componente === 'tarea' ? 'Editar tarea' : `Editar datos de ${user.name}`}</DialogTitle>
+                <DialogContent sx={{ backgroundColor: '#b5aa98', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {renderInputs()}
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: '#b5aa98', padding: '0 1.5rem 1rem 0' }}>
                     <Button

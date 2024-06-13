@@ -15,7 +15,12 @@ class UserController extends Controller
     public function index() {
         $data = User::whereDoesntHave('roles', function ($query) {
             $query->where('name', 'admin');
-        })->get(['id', 'name', 'email', 'employee_id', 'role', 'birthday', 'phone_number']);
+        })->get(['id', 'name', 'email', 'employee_id', 'birthday', 'phone_number', 'role']);
+    
+        $data = $data->map(function($user) {
+            $user->rol = $user->roles->first()->name ?? null;
+            return $user;
+        });
         return response()->json($data, 200);
     }
 
